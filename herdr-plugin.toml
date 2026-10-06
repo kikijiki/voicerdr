@@ -1,0 +1,96 @@
+id = "voicerdr"
+name = "voicerdr"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "Configurable local voice assistant for routing speech into Herdr spaces"
+platforms = ["linux"]
+
+# Install-time dependency setup. Model assets remain an explicit operator step.
+[[build]]
+command = ["bash", "scripts/run.sh", "--sync-only"]
+
+# One-shot: ensure the out-of-band daemon is healthy, then exit.
+[[startup]]
+command = ["bash", "scripts/run.sh", "ensure"]
+
+[[actions]]
+id = "status"
+title = "voicerdr: status"
+description = "Show mic/listen state (also pops a Herdr toast with last heard line)"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ctl", "status"]
+
+[[actions]]
+id = "listen"
+title = "voicerdr: listen"
+description = "Unmute the mic / enter listen mode"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ctl", "listen"]
+
+[[actions]]
+id = "mute"
+title = "voicerdr: mute"
+description = "Mute the mic (daemon stays up)"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ctl", "mute"]
+
+[[actions]]
+id = "ensure"
+title = "voicerdr: ensure daemon"
+description = "Start or reconnect the voicerdr daemon if needed"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ensure"]
+
+[[actions]]
+id = "quit"
+title = "voicerdr: quit daemon"
+description = "Gracefully stop the voicerdr daemon"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ctl", "quit"]
+
+[[actions]]
+id = "service-install"
+title = "voicerdr: install systemd service"
+description = "Install, enable, and start optional systemd user supervision"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "service", "install", "--enable", "--now"]
+
+[[actions]]
+id = "service-uninstall"
+title = "voicerdr: remove systemd service"
+description = "Quit voicerdr and remove its managed systemd user unit"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "service", "uninstall"]
+
+[[actions]]
+id = "service-disable"
+title = "voicerdr: disable systemd service"
+description = "Quit voicerdr and disable its systemd user service"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "service", "disable"]
+
+[[actions]]
+id = "spaces"
+title = "voicerdr: spaces"
+description = "Show space numbers + speakable nicknames"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ctl", "aliases"]
+
+[[panes]]
+id = "spaces"
+title = "voicerdr spaces"
+description = "Directory of #N / nicknames you can say to the assistant"
+placement = "overlay"
+command = ["bash", "scripts/run.sh", "spaces-ui"]
+
+[[actions]]
+id = "resolve-test"
+title = "voicerdr: test space resolve"
+description = "Resolve VOICERDR_TEST_SPACE (or focused workspace label) without prompting"
+contexts = ["workspace", "pane"]
+command = ["bash", "scripts/run.sh", "ctl", "resolve"]
+
+# Fan-in from Herdr for all panes (socket subscribe requires pane_id).
+[[events]]
+on = "pane.agent_status_changed"
+command = ["bash", "scripts/run.sh", "forward-event"]

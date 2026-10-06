@@ -1,0 +1,17 @@
+# Spoken nicknames → Herdr workspace labels (case-insensitive).
+# Copied to HERDR_PLUGIN_CONFIG_DIR/aliases.toml on first ensure if missing.
+#
+# Prefer short, easy-to-pronounce words STT can hear. You can also say the
+# Herdr slot number (#1, #2, …) — voicerdr prefixes those onto space labels
+# when [ui].show_space_numbers is true.
+#
+# Private overlays: config/aliases.local.toml (gitignored).
+
+[aliases]
+# Examples (replace with your own):
+# web = "frontend"
+# "web app" = "frontend"
+# api = "backend"
+# docs = "docs-site"
+# voice = "voicerdr"
+# infra = "infrastructure"

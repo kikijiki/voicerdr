@@ -1,0 +1,105 @@
+# Example config — copied to HERDR_PLUGIN_CONFIG_DIR/config.toml on first ensure.
+# Edit the copy under the config dir; this file in the repo is a template only.
+# Optional overlays: config/config.local.toml (gitignored).
+
+[assistant]
+# Visible identity. If [wake].phrases is omitted, natural forms are derived from it.
+name = "Jenny"
+# Code-native terminal portrait: woman | none.
+avatar = "woman"
+
+[llm]
+# OpenAI-compatible endpoint (llama.cpp server, Ollama, vLLM, LM Studio, …).
+# llama.cpp usually wants base_url ending in /v1.
+# Prefer private overrides in config/config.local.toml (gitignored).
+base_url = "http://127.0.0.1:8080/v1"
+api_key = "local"
+model = "local-model"
+timeout_secs = 15
+temperature = 0.0
+# Long dictations are reproduced in full inside JSON; leave enough output room.
+max_tokens = 2048
+# Actions below this planner confidence fail closed and ask for clarification.
+min_confidence = 0.85
+# Set true if your endpoint has a publicly trusted certificate.
+verify_ssl = false
+# Reasoning is disabled in code (chat_template_kwargs.enable_thinking=false +
+# reasoning_effort=none) so Qwen returns JSON instead of chain-of-thought.
+
+# Optional independent verifier endpoint/model. Omit any field to inherit [llm].
+[verifier]
+# base_url = "http://127.0.0.1:8080/v1"
+# api_key = "local"
+# model = "local-model"
+# timeout_secs = 15
+# temperature = 0.0
+# max_tokens = 2048
+# verify_ssl = false
+
+[audio]
+# Start listening when the daemon comes up (set true to stay muted until listen).
+mute_on_start = false
+# PyAudio input device index, or omit / null for system default.
+# input_device_index = 0
+sample_rate = 16000
+# Moonshine model: tiny | base | tiny_streaming | base_streaming | …
+# Run `voicerdr bootstrap-models` before taking this machine offline.
+stt_model = "base"
+# Required trailing silence before VAD finalizes an utterance. The 1.3-second
+# default favors complete one-shot messages over low endpoint latency. Values
+# are bounded to 0.8-3.0 seconds when loaded.
+vad_stop_secs = 1.3
+
+[wake]
+# If non-empty, ignore utterances that do not start with a wake phrase.
+# Empty list = every utterance in listen mode is a command (no wake gate).
+# Omit phrases to derive ["hey jenny", "okay jenny", "jenny"] from the
+# configured assistant name. Set an explicit list to customize or disable it.
+# phrases = ["hey jenny", "okay jenny", "jenny"]
+require_wake = true
+# Toast every non-wake transcript (debug only).
+feedback_heard = false
+
+[dictation]
+# Semantic examples supplied to the intent planner for starting, finishing, and
+# cancelling buffered capture. They are never matched or stripped locally.
+# The LLM decides every capture transition and the final routed action.
+enabled = true
+start_phrases = ["listen", "dictate", "dictates", "dictation", "take a message", "take a note", "take a memo"]
+closing_phrases = ["send it", "send that", "that's all", "thats all", "over", "go ahead"]
+cancel_phrases = ["never mind", "nevermind", "cancel that", "scratch that", "forget it"]
+max_secs = 120
+clarification_max_secs = 45
+
+[talk]
+# Runtime announcement policy: silent | blocked_only | milestones | verbose.
+# Voice commands can change this until the daemon restarts.
+mode = "blocked_only"
+# Labels or workspace ids whose lifecycle events should never be spoken.
+quiet_workspaces = []
+# Milestone statuses announced for assistant-routed work.
+interesting_statuses = ["blocked", "done"]
+min_interval_secs = 20
+prefer_titles = true
+max_spoken_chars = 280
+speak_enabled = true
+# Kokoro voice id (e.g. af_heart). Prefer `voicerdr bootstrap-models`; otherwise
+# its model and voice table download on first speak.
+tts_voice = "af_heart"
+tts_speed = 1.0
+# Speak short acks for "Sent to …" as well as status/clarify lines.
+speak_acks = true
+
+[herdr]
+subscribe_retry_secs = 2
+# Switch Herdr UI focus to the target space when delivering a prompt.
+focus_on_prompt = true
+
+[ui]
+# Prefix Herdr sidebar space labels with #N so you can see/say the number.
+# Set false to restore bare labels (voicerdr remembers the base names).
+show_space_numbers = true
+# Create a non-focused Herdr workspace that tails the readable activity history.
+activity_workspace = true
+activity_workspace_label = "voicerdr activity"
+activity_history_lines = 250

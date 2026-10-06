@@ -1,0 +1,17 @@
+@MANAGED_MARKER@
+[Unit]
+Description=voicerdr local voice assistant
+
+[Service]
+Type=simple
+WorkingDirectory=@WORKING_DIRECTORY@
+EnvironmentFile=-@ENVIRONMENT_FILE@
+ExecStart=@LAUNCHER@ daemon --foreground
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=15s
+KillMode=control-group
+UMask=0077
+
+[Install]
+WantedBy=default.target
